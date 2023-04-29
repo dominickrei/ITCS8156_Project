@@ -219,8 +219,8 @@ if not args.test:
 
                 losses.append(loss.item())
             
-            print('DEBUG: Breaking in train')
-            break # DEBUG
+#            print('DEBUG: Breaking in train')
+#            break # DEBUG
 
 
         # eval
@@ -245,7 +245,6 @@ if not args.test:
                         x1, x2 = x[i].to(device), x[j].to(device)
                         s1, s2 = m3d.forward_features(x1), m3d.forward_features(x2)
                         s1, s2 = s1.cpu(), s2.cpu()
-                        
 #                        if len(s1.shape) == 3:
 #                            s1 = torch.mean(s1, dim=1)
 #                            s2 = torch.mean(s2, dim=1)
@@ -253,6 +252,8 @@ if not args.test:
                         if '3dtrl' not in args.model:
                             if "swin" in args.model:
                                 s1, s2 = s1.mean(dim=1).cpu(), s2.mean(dim=1).cpu()
+                            elif "resnet" in args.model:
+                                s1, s2 = torch.mean(s1.view(s1.shape[0], 512, -1), dim=2), torch.mean(s2.view(s2.shape[0], 512, -1), dim=2)
                             else:
                                 s1, s2 = s1[:, 0].cpu(), s2[:, 0].cpu()
                         
@@ -260,8 +261,8 @@ if not args.test:
                         eval_cycle_errors.append(cycle_error(s1, s2))
                         eval_taus.append(kendalls_tau(s1, s2))
                 
-                print('DEBUG: Breaking in eval')
-                break # DEBUG
+#                print('DEBUG: Breaking in eval')
+#                break # DEBUG
 
         a_error = np.mean(eval_align_errors)
         c_error = np.mean(eval_cycle_errors)
@@ -344,8 +345,8 @@ for i, tr in enumerate(test_trs):
                 test_cycle_errors.append(cycle_error(s1, s2))
                 test_taus.append(kendalls_tau(s1, s2))
 
-        print('DEBUG: Breaking in test')
-        break
+#        print('DEBUG: Breaking in test')
+#        break
 
 a_error = np.mean(test_align_errors)
 c_error = np.mean(test_cycle_errors)
